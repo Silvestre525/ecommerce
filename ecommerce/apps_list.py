@@ -7,4 +7,5 @@ APPS = [
     'django.contrib.staticfiles',
     'apps.product',
     'apps.category',
+    'apps.suppliers',
 ]
