@@ -5,4 +5,4 @@ from .models import Suppliers
 class suppliersSerializer(serializers.ModelSerializer):
     class Meta:
         model = Suppliers
-        fields = ['all']
+        fields = '__all__'

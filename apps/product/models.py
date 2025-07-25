@@ -10,7 +10,7 @@ class Product(models.Model):
 
     categories = models.ManyToManyField(Category, related_name='products')
 
-    product = models.ForeignKey(Suppliers, related_name="suppliers", on_delete=models.CASCADE) 
+    product = models.ForeignKey(Suppliers, related_name="suppliers", on_delete=models.CASCADE, null=True, blank=True) 
     
     class Meta:
         db_table = 'Product'
