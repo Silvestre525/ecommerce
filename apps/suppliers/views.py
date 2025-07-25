@@ -1,8 +1,8 @@
 from django.shortcuts import render
-from rest_framework import models
+from rest_framework import viewsets
 from .models import Suppliers
 from .serializers import suppliersSerializer
 
-class suppliersViewSet(models.ModelViewSet):
-    queryset = Suppliers.object.all()
+class suppliersViewSet(viewsets.ModelViewSet):
+    queryset = Suppliers.objects.all()
     serializer_class = suppliersSerializer
