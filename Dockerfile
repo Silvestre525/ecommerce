@@ -13,6 +13,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copia el resto del código de la app
 COPY . .
 
+#Copia script de arranque personalizado
+COPY entrypoint.sh /entrypoint.sh  
+
+#Da permisos de ejecución al script
+RUN chmod +x entrypoint.sh
+
 # Expone el puerto que usa Django (por defecto 8000)
 EXPOSE 8000
 

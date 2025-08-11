@@ -10,4 +10,4 @@ python manage.py migrate
 python manage.py runserver 0.0.0.0:8000
 
 #ejecuta este comando para darle permisos  localmente:
-##chmod +x entrypoint.sh
+
