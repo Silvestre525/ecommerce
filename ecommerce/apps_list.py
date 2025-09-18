@@ -8,4 +8,5 @@ APPS = [
     'apps.product',
     'apps.category',
     'apps.suppliers',
+    'drf_spectacular',
 ]

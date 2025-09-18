@@ -87,6 +87,20 @@ DATABASES = {
     }
 }
 
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # ... otras configuraciones
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Tu API',
+    'DESCRIPTION': 'Descripción de tu API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # Configuraciones adicionales
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SORT_OPERATIONS': False,
+}
 
 
 
