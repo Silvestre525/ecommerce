@@ -12,4 +12,5 @@ APPS = [
     'apps.size',
     'apps.color',
     'apps.BaseModel',
+    'apps.geo',
 ]
