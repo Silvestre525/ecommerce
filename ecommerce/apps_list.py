@@ -9,4 +9,7 @@ APPS = [
     'apps.category',
     'apps.suppliers',
     'drf_spectacular',
+    'apps.size',
+    'apps.color',
+    'apps.BaseModel',
 ]
