@@ -7,6 +7,10 @@ def size_data(apps, schema_editor):
     for title in ['S', 'M', 'L', 'XL', 'XXL']:
         Size.objects.get_or_create(title=title)
 
+def size_data_reverse(apps, schema_editor):
+    Size = apps.get_model('size', 'Size')
+    Size.objects.filter(name__in=['S', 'M', 'L', 'XL', 'XXL']).delete()
+
 
 class Migration(migrations.Migration):
 
@@ -15,5 +19,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(size_data),
+        migrations.RunPython(size_data, size_data_reverse),
     ]
