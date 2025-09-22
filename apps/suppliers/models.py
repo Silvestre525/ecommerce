@@ -7,9 +7,7 @@ class Suppliers(BaseModel):
     contact_person= models.CharField(max_length=50, null=False, blank=False)
     contact_email = models.EmailField(max_length=200, null=False, blank=False)
     adress = models.CharField(max_length=100, null=False, blank=False)
-    
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, related_name='suppliers',default=1)
-    province = models.ForeignKey(Province, on_delete=models.CASCADE, related_name='suppliers',default=1)
+
     city = models.ForeignKey(City, on_delete=models.CASCADE, related_name='suppliers',default=1)
   
 
