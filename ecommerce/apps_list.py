@@ -13,4 +13,5 @@ APPS = [
     'apps.color',
     'apps.BaseModel',
     'apps.geo',
+    'apps.person',
 ]
