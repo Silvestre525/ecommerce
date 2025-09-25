@@ -2,7 +2,7 @@ from django.shortcuts import render
 from rest_framework import viewsets
 from .models import Product
 from .serializers import ProductSerializer
-from utils.permissions import IsAdministrador
+from ..utils.permissions import IsAdministrador, IsVisitante
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -13,5 +13,5 @@ class ProductViewSet(viewsets.ModelViewSet):
         if self.action in ['create', 'update', 'destroy']:
             permission_classes = [IsAdministrador]
         else:
-            permission_classes = [IsAuthenticated]
+            permission_classes = [IsVisitante]
         return [p() for p in permission_classes]
