@@ -4,8 +4,9 @@ from rest_framework import serializers
 from .models import Person
 from django.db import transaction
 from rest_framework.authtoken.models import Token
+from django.contrib.auth.models import Group
 
-User = get_user_model
+User = get_user_model()
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,6 +28,8 @@ class UserRegistrationSerializer(serializers.Serializer):
     
     @transaction.atomic
     def create(self, validated_data):
+        visitante_group = Group.objects.get(name="Visitante") ##Para que todos los usuarios nuevos sean visitantes
+        user.groups.add(visitante_group)
         person_data = validated_data.pop('persona')
         user = User.objects.create_user(
             username=validated_data['username'],

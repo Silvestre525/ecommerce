@@ -14,4 +14,6 @@ APPS = [
     'apps.BaseModel',
     'apps.geo',
     'apps.person',
+    'apps.role',
+    'apps.utils',
 ]

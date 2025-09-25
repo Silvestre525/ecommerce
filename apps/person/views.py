@@ -13,12 +13,11 @@ from rest_framework.authtoken.models import Token
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
-    def post(self,request):
+    def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            token = Token.object.get(user=user)
-
+            token = Token.objects.get(user=user)
             return Response({
                 'token': token.key,
                 'user_id': user.pk,
@@ -31,7 +30,7 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        persona = getattr(request.user, 'persona', None)
+        persona = getattr(request.user.person, None)
         return Response({
             'username': request.user.username,
             'email': request.user.email,
