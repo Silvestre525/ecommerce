@@ -28,14 +28,24 @@ class UserRegistrationSerializer(serializers.Serializer):
     
     @transaction.atomic
     def create(self, validated_data):
-        visitante_group = Group.objects.get(name="Visitante") ##Para que todos los usuarios nuevos sean visitantes
-        user.groups.add(visitante_group)
+        # Datos de la persona
         person_data = validated_data.pop('persona')
+
+        # Crear usuario
         user = User.objects.create_user(
             username=validated_data['username'],
             email=validated_data['email'],
             password=validated_data['password']
         )
+
+        # Asignar al grupo visitante
+        visitante_group, _ = Group.objects.get_or_create(name="Visitante")
+        user.groups.add(visitante_group)
+
+        # Crear la persona relacionada
         Person.objects.create(user=user, **person_data)
-        Token.objects.create(user=user) # crear token (se puede obtener luego con obtain_auth_token también)
+
+        # Crear token
+        Token.objects.create(user=user)
+
         return user

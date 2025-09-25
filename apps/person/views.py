@@ -5,6 +5,7 @@ from rest_framework import status
 from .serializers import UserRegistrationSerializer, PersonSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.authtoken.models import Token
+from drf_spectacular.utils import extend_schema
 
 # Create your views here.
 
@@ -12,6 +13,11 @@ from rest_framework.authtoken.models import Token
 
 class RegisterView(APIView):
     permission_classes = [AllowAny]
+
+    @extend_schema(
+        request=UserRegistrationSerializer,
+        responses={201: UserRegistrationSerializer}
+    )
 
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)

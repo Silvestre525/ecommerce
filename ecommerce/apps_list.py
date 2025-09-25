@@ -16,4 +16,5 @@ APPS = [
     'apps.person',
     'apps.role',
     'apps.utils',
+    'rest_framework.authtoken',
 ]
