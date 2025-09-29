@@ -17,4 +17,5 @@ APPS = [
     'apps.role',
     'apps.utils',
     'rest_framework.authtoken',
+    'apps.order',
 ]
