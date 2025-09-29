@@ -1,6 +1,7 @@
 from django.db import models
 from ..category.models import Category
 from ..suppliers.models import Suppliers
+from ..order.models import Order
 from ..BaseModel.models import BaseModel
 # Create your models here.
 class Product(BaseModel):
@@ -12,6 +13,8 @@ class Product(BaseModel):
     categories = models.ManyToManyField(Category, related_name='products')
 
     suppliers = models.ManyToManyField(Suppliers, related_name='products')
+    
+    order = models.ManyToManyField(Order,related_name='products')
     
     class Meta:
         db_table = 'Product'
