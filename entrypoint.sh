@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Espera a que la base de datos esté lista antes de continuar.
-ol# El script wait-for-postgres.sh esperará y luego ejecutará el comando que se le pase.
+#El script wait-for-postgres.sh esperará y luego ejecutará el comando que se le pase.
 /wait-for-postgres.sh "$DB_HOST" "echo 'Aplicando migraciones de la base de datos...'"
 /wait-for-postgres.sh "$DB_HOST" "python manage.py migrate"
 
