@@ -35,6 +35,7 @@ class RegisterView(APIView):
 class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(responses=PersonSerializer)
     def get(self, request):
         persona = getattr(request.user.person, None)
         return Response({
