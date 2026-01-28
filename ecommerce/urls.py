@@ -14,21 +14,30 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import include, path
 from django.views.generic import RedirectView
-from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from drf_spectacular.views import (
+    SpectacularAPIView,
+    SpectacularRedocView,
+    SpectacularSwaggerView,
+)
 
 urlpatterns = [
-    path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
-    path('admin/', admin.site.urls),
-    path('api/product/', include('apps.product.urls')),
-    path('api/category/', include('apps.category.urls')),
-    path('api/suppliers/', include('apps.suppliers.urls')),
-    path('api/', include('apps.person.urls')),
-
-
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/docs/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path("", RedirectView.as_view(url="/api/docs/", permanent=False)),
+    path("admin/", admin.site.urls),
+    path("api/product/", include("apps.product.urls")),
+    path("api/category/", include("apps.category.urls")),
+    path("api/suppliers/", include("apps.suppliers.urls")),
+    path("api/order/", include("apps.order.urls")),
+    path("api/geo/", include("apps.geo.urls")),
+    path("api/", include("apps.person.urls")),
+    path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
+    path(
+        "api/docs/",
+        SpectacularSwaggerView.as_view(url_name="schema"),
+        name="swagger-ui",
+    ),
+    path("api/redoc/", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]

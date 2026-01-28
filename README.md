@@ -1,123 +1,330 @@
-# E-commerce API con Django y Docker
+# 🛍️ Ecommerce API
 
-Este proyecto es una API RESTful para una plataforma de E-commerce, desarrollada con Django y Django REST Framework. Toda la aplicación está containerizada utilizando Docker y Docker Compose para un despliegue y desarrollo simplificado y consistente.
+API REST completa para sistema de ecommerce desarrollada con Django REST Framework.
 
-## Tabla de Contenidos
-1.  [Características Principales](#características-principales)
-2.  [Tecnologías Utilizadas](#tecnologías-utilizadas)
-3.  [Estructura del Proyecto](#estructura-del-proyecto)
-4.  [Requisitos Previos](#requisitos-previos)
-5.  [Instalación y Ejecución](#instalación-y-ejecución)
-6.  [Acceso a la API](#acceso-a-la-api)
-7.  [Funcionamiento del Arranque con Docker](#funcionamiento-del-arranque-con-docker)
+## 📋 Características
 
----
+- **Autenticación por tokens** con roles diferenciados
+- **Sistema de permisos** granular (Administrador/Visitante)
+- **Catálogo de productos** con filtrado y búsqueda
+- **Gestión de categorías** y proveedores
+- **Sistema de órdenes/pedidos** con permisos por propietario
+- **Datos geográficos** para direcciones
+- **Documentación automática** con Swagger/OpenAPI
 
-## Características Principales
+## 🚀 Instalación y Configuración
 
-- **API RESTful**: Construida siguiendo los principios de REST para una comunicación cliente-servidor clara y predecible.
-- **Containerización Completa**: Usa Docker para encapsular la aplicación y la base de datos, garantizando que funcione de la misma manera en cualquier entorno.
-- **Base de Datos PostgreSQL**: Utiliza PostgreSQL, una base de datos relacional potente y robusta.
-- **Documentación Automática de API**: Integrado con `drf-spectacular` para generar un esquema OpenAPI (Swagger UI) de forma automática.
-- **Arranque Robusto**: Incluye un mecanismo de espera que asegura que la aplicación no intente conectarse a la base de datos hasta que esta esté completamente lista, evitando errores de conexión al inicio.
-- **Migraciones Automáticas**: Las migraciones de la base de datos de Django se aplican automáticamente cada vez que se inician los contenedores.
-
-## Tecnologías Utilizadas
-
-- **Backend**: Django, Django REST Framework
-- **Base de Datos**: PostgreSQL
-- **Containerización**: Docker, Docker Compose
-- **Documentación de API**: `drf-spectacular` (para OpenAPI/Swagger)
-- **Driver de Base de Datos**: `psycopg2-binary`
-- **Gestión de Entorno**: `python-dotenv`
-
-## Estructura del Proyecto
-
-```
-ecommerce/
-├── apps/                   # Directorio para las aplicaciones de Django
-│   ├── person/
-│   └── ...
-├── ecommerce/              # Directorio de configuración del proyecto Django
-│   ├── settings.py         # Configuración principal
-│   └── urls.py             # URLs principales
-├── .env.example            # Archivo de ejemplo para las variables de entorno
-├── docker-compose.yml      # Orquesta los servicios de la aplicación (web y db)
-├── Dockerfile              # Define cómo construir la imagen Docker para la app web
-├── entrypoint.sh           # Script que se ejecuta al iniciar el contenedor web
-├── manage.py               # Utilidad de línea de comandos de Django
-├── requirements.txt        # Dependencias de Python
-└── wait-for-postgres.sh    # Script de utilidad para esperar a que la BD esté lista
-```
-
-## Requisitos Previos
-
-Asegúrate de tener instaladas las siguientes herramientas en tu sistema:
-
-- Docker
-- Docker Compose (generalmente incluido con Docker Desktop)
-
-## Instalación y Ejecución
-
-Sigue estos pasos para clonar, configurar y ejecutar el proyecto en tu máquina local.
-
-**1. Clona el Repositorio**
-
+### 1. Clonar el repositorio
 ```bash
-git clone <URL_DEL_REPOSITORIO>
+git clone <url-del-repo>
 cd ecommerce
 ```
 
-**2. Crea el archivo de variables de entorno**
-
-Este proyecto utiliza un archivo `.env` para gestionar las credenciales de la base de datos y otras configuraciones. Puedes copiar el archivo de ejemplo:
-
+### 2. Crear entorno virtual
 ```bash
-cp .env.example .env
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+# o
+venv\Scripts\activate     # Windows
 ```
 
-El contenido del archivo `.env` debería ser el siguiente. Puedes cambiar los valores si lo deseas, pero los valores por defecto funcionarán sin problemas.
+### 3. Instalar dependencias
+```bash
+pip install -r requirements.txt
+```
 
+### 4. Configurar base de datos
+Crear archivo `.env` en la raíz del proyecto:
 ```env
-# .env
-DB_NAME=ecommerceDjango
-DB_USER=user
-DB_PASSWORD=password
+DB_NAME=tu_db_name
+DB_USER=tu_db_user
+DB_PASSWORD=tu_db_password
+DB_HOST=localhost
+DB_PORT=5432
 ```
 
-**3. Construye y Levanta los Contenedores**
+### 5. Ejecutar migraciones
+```bash
+python manage.py migrate
+```
 
-Este es el comando principal. Construirá la imagen de Docker para el servicio `web` (si no existe o si se han hecho cambios en el `Dockerfile`) y luego iniciará todos los servicios.
+### 6. Crear grupos y usuarios de prueba
+```bash
+python manage.py init_groups
+python manage.py create_test_users
+```
+
+### 7. Ejecutar servidor
+```bash
+python manage.py runserver
+```
+
+## 📚 Documentación de la API
+
+### 🌐 Acceso a Swagger UI
+- **Swagger UI**: http://127.0.0.1:8000/api/docs/
+- **ReDoc**: http://127.0.0.1:8000/api/redoc/
+- **Schema JSON**: http://127.0.0.1:8000/api/schema/
+
+## 👥 Roles y Permisos
+
+### 🔑 Sistema de Autenticación
+La API utiliza **Token Authentication**. Para acceder a endpoints protegidos:
+
+1. Obtén un token: `POST /api/login/`
+2. Incluye el token en el header: `Authorization: Token tu_token_aqui`
+
+### 👤 Roles de Usuario
+
+#### **🌐 Público** (sin autenticación)
+- ✅ Ver catálogo de productos básico
+- ✅ Ver lista de categorías
+- ✅ Consultar ubicaciones geográficas
+
+#### **👋 Visitante** (usuario registrado)
+- ✅ Todo lo público +
+- ✅ Ver catálogo completo de productos
+- ✅ Ver detalles de productos
+- ✅ Ver proveedores
+- ✅ Crear sus propias órdenes
+- ✅ Ver solo sus órdenes
+- ✅ Ver su perfil
+- ❌ Modificar productos, categorías o proveedores
+
+#### **⚡ Administrador** (usuario admin)
+- ✅ Todo lo del visitante +
+- ✅ Crear/editar/eliminar productos
+- ✅ Crear/editar/eliminar categorías
+- ✅ Crear/editar/eliminar proveedores
+- ✅ Ver todas las órdenes del sistema
+- ✅ Eliminar órdenes
+
+## 📊 Endpoints Principales
+
+### 🔐 Autenticación
+| Endpoint | Método | Descripción | Acceso |
+|----------|--------|-------------|--------|
+| `/api/register/` | POST | Registrar nuevo usuario | Público |
+| `/api/login/` | POST | Iniciar sesión | Público |
+| `/api/profile/` | GET | Ver perfil de usuario | Autenticado |
+
+### 🛍️ Productos
+| Endpoint | Método | Descripción | Permisos |
+|----------|--------|-------------|----------|
+| `/api/product/` | GET, POST | Listar/Crear productos | GET: Visitante+, POST: Admin |
+| `/api/product/{id}/` | GET, PUT, DELETE | Ver/Editar/Eliminar | GET: Visitante+, PUT/DELETE: Admin |
+| `/api/product/public_catalog/` | GET | Catálogo público básico | Público |
+
+### 📂 Categorías
+| Endpoint | Método | Descripción | Permisos |
+|----------|--------|-------------|----------|
+| `/api/category/` | GET, POST | Listar/Crear categorías | GET: Visitante+, POST: Admin |
+| `/api/category/{id}/` | GET, PUT, DELETE | Ver/Editar/Eliminar | GET: Visitante+, PUT/DELETE: Admin |
+| `/api/category/public_list/` | GET | Lista pública | Público |
+
+### 🏢 Proveedores
+| Endpoint | Método | Descripción | Permisos |
+|----------|--------|-------------|----------|
+| `/api/suppliers/` | GET, POST | Listar/Crear proveedores | GET: Visitante+, POST: Admin |
+| `/api/suppliers/{id}/` | GET, PUT, DELETE | Ver/Editar/Eliminar | GET: Visitante+, PUT/DELETE: Admin |
+
+### 📋 Órdenes
+| Endpoint | Método | Descripción | Permisos |
+|----------|--------|-------------|----------|
+| `/api/order/` | GET, POST | Listar/Crear órdenes | Admin: todas, Visitante: propias |
+| `/api/order/{id}/` | GET, PUT, DELETE | Ver/Editar/Eliminar | Propietario o Admin |
+| `/api/order/my_orders/` | GET | Mis órdenes | Visitante+ |
+
+### 🌍 Geografía
+| Endpoint | Método | Descripción | Permisos |
+|----------|--------|-------------|----------|
+| `/api/geo/countries/` | GET | Lista de países | Público |
+| `/api/geo/provinces/?country_id=1` | GET | Provincias por país | Público |
+| `/api/geo/cities/?province_id=1` | GET | Ciudades por provincia | Público |
+
+## 🧪 Usuarios de Prueba
+
+El comando `python manage.py create_test_users` crea estos usuarios:
+
+### 👑 Administrador
+- **Username**: `admin_test`
+- **Password**: `admin123`
+- **Rol**: Administrador
+- **Permisos**: Acceso completo
+
+### 👤 Visitante
+- **Username**: `visitante_test`
+- **Password**: `visitante123`
+- **Rol**: Visitante
+- **Permisos**: Solo lectura + gestión de propias órdenes
+
+### 👥 Usuario Normal
+- **Username**: `user_normal`
+- **Password**: `user123`
+- **Rol**: Visitante
+- **Permisos**: Solo lectura + gestión de propias órdenes
+
+## 🔧 Ejemplos de Uso
+
+### 1. Obtener Token de Autenticación
+```bash
+curl -X POST http://127.0.0.1:8000/api/login/ \
+  -H "Content-Type: application/json" \
+  -d '{
+    "username": "admin_test",
+    "password": "admin123"
+  }'
+```
+
+**Respuesta:**
+```json
+{
+  "token": "9340ff6d6806e7dc37d7...",
+  "user_id": 1,
+  "username": "admin_test",
+  "message": "Login successful"
+}
+```
+
+### 2. Listar Productos (con autenticación)
+```bash
+curl -H "Authorization: Token 9340ff6d6806e7dc37d7..." \
+  http://127.0.0.1:8000/api/product/
+```
+
+### 3. Ver Catálogo Público (sin autenticación)
+```bash
+curl http://127.0.0.1:8000/api/product/public_catalog/
+```
+
+### 4. Crear Producto (solo admin)
+```bash
+curl -X POST http://127.0.0.1:8000/api/product/ \
+  -H "Authorization: Token tu_token_admin" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Producto Test",
+    "stock": 10,
+    "color": 1,
+    "size": 1
+  }'
+```
+
+### 5. Crear Orden (visitante)
+```bash
+curl -X POST http://127.0.0.1:8000/api/order/ \
+  -H "Authorization: Token tu_token_visitante" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "total": 199.99
+  }'
+```
+
+## 🔍 Filtrado y Búsqueda
+
+### Productos
+```bash
+# Buscar por nombre
+GET /api/product/?search=camiseta
+
+# Filtrar por categoría
+GET /api/product/?categories=1
+
+# Ordenar por stock
+GET /api/product/?ordering=stock
+
+# Combinado
+GET /api/product/?search=deportiva&categories=2&ordering=name
+```
+
+### Categorías
+```bash
+# Buscar por nombre o descripción
+GET /api/category/?search=ropa
+
+# Ordenar alfabéticamente
+GET /api/category/?ordering=name
+```
+
+## 🏗️ Arquitectura del Proyecto
+
+```
+ecommerce/
+├── apps/
+│   ├── category/          # Gestión de categorías
+│   ├── geo/              # Países, provincias, ciudades
+│   ├── order/            # Sistema de órdenes
+│   ├── person/           # Usuarios y autenticación
+│   ├── product/          # Catálogo de productos
+│   ├── suppliers/        # Gestión de proveedores
+│   └── utils/            # Permisos y utilidades
+├── ecommerce/            # Configuración principal
+├── logs/                 # Archivos de log (ignorados por git)
+└── requirements.txt      # Dependencias
+```
+
+## 🛠️ Comandos Útiles
 
 ```bash
-docker compose up --build
+# Crear grupos y permisos
+python manage.py init_groups
+
+# Crear usuarios de prueba
+python manage.py create_test_users
+
+# Reset usuarios de prueba
+python manage.py create_test_users --reset
+
+# Reset grupos y permisos
+python manage.py init_groups --reset
+
+# Generar schema de API
+python manage.py spectacular --color --file schema.yml
+
+# Ver logs en tiempo real (si están configurados)
+tail -f logs/ecommerce.log
 ```
 
-La primera vez que ejecutes este comando, Docker descargará la imagen de `postgres` y la de `python`, instalará las dependencias y configurará todo. Los logs en tu terminal mostrarán el proceso de arranque, incluyendo la espera de la base de datos y la ejecución de las migraciones.
+## 🐛 Solución de Problemas
 
-Para detener los contenedores, presiona `Ctrl + C` en la terminal donde se están ejecutando, y luego ejecuta:
+### Error: "Unable to log in with provided credentials"
+- Verifica username y password
+- Asegúrate de que el usuario existe: `python manage.py create_test_users`
 
-```bash
-docker compose down
-```
+### Error: Permission denied
+- Verifica que el token esté en el header: `Authorization: Token tu_token`
+- Confirma que el usuario tenga los permisos necesarios
+- Los administradores pueden acceder a todo
+- Los visitantes solo a endpoints de lectura y sus propias órdenes
 
-## Acceso a la API
+### Error: Token inválido
+- El token puede haber expirado o ser incorrecto
+- Haz login nuevamente: `POST /api/login/`
 
-- **API Principal**: Una vez que los contenedores estén en funcionamiento, la API estará disponible en `http://localhost:8000/`.
-- **Documentación de la API (Swagger UI)**: Puedes acceder a la documentación interactiva generada por drf-spectacular en `http://localhost:8000/api/schema/swagger-ui/`.
-- **Conexión a la Base de Datos**: El servicio de PostgreSQL está expuesto en el puerto `5433` de tu máquina local y se conecta al puerto `5432` del contenedor. Puedes usar un cliente de base de datos como DBeaver o pgAdmin para conectarte usando las credenciales del archivo `.env`.
+## 🚀 Próximas Funcionalidades
 
-## Funcionamiento del Arranque con Docker
+- [ ] Dashboard de administración con estadísticas
+- [ ] Sistema de inventario avanzado
+- [ ] Notificaciones por email
+- [ ] Carrito de compras persistente
+- [ ] Sistema de pagos
+- [ ] API de envíos
+- [ ] Sistema de reviews y calificaciones
 
-El proceso de arranque está diseñado para ser robusto y evitar errores comunes de conexión:
+## 📝 Licencia
 
-1.  **`docker compose up`**: Docker Compose lee el `docker-compose.yml` e inicia los servicios `db` y `web`.
-2.  **Servicio `db`**: El contenedor de PostgreSQL se inicia. Si es la primera vez, crea la base de datos y el usuario especificados en el archivo `.env`.
-3.  **Servicio `web`**:
-    -   El `Dockerfile` define que el `ENTRYPOINT` del contenedor es el script `/entrypoint.sh`.
-    -   `entrypoint.sh` se ejecuta y su primera tarea es llamar a `wait-for-postgres.sh`.
-    -   `wait-for-postgres.sh` entra en un bucle, intentando conectarse al host `db` en el puerto `5432` cada segundo. No continuará hasta que la conexión sea exitosa.
-    -   Una vez que la base de datos está lista, `entrypoint.sh` ejecuta el comando `python manage.py migrate` para aplicar las migraciones.
-    -   Finalmente, `entrypoint.sh` ejecuta el comando `CMD` del `Dockerfile`, que es `python manage.py runserver 0.0.0.0:8000`, iniciando el servidor de Django.
+Este proyecto está bajo la Licencia MIT.
 
-Este flujo garantiza que la aplicación solo se inicie después de que la base de datos esté completamente inicializada y las migraciones se hayan aplicado.
+## 🤝 Contribuciones
+
+Las contribuciones son bienvenidas. Por favor:
+
+1. Haz fork del proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
+3. Commit tus cambios (`git commit -am 'Agregar nueva funcionalidad'`)
+4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
+5. Abre un Pull Request
+
+## 📧 Contacto
+
+Para preguntas o soporte, contacta al equipo de desarrollo.

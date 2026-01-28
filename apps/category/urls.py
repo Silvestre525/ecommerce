@@ -1,9 +1,30 @@
 from django.urls import path
-from .views import CatgeryViewSet
+
+from .views import CategoryViewSet
 
 urlpatterns = [
-    path("",CatgeryViewSet.as_view({"get":"list","post":"create"}),
-         name="list_administrative"),
-    path("<int:pk>/",CatgeryViewSet.as_view({"get":"retrieve","put":"update","delete":"destroy"}),
-         name="detail_administrative"),
+    # URLs básicas CRUD
+    path(
+        "",
+        CategoryViewSet.as_view({"get": "list", "post": "create"}),
+        name="category_list_create",
+    ),
+    path(
+        "<int:pk>/",
+        CategoryViewSet.as_view(
+            {
+                "get": "retrieve",
+                "put": "update",
+                "patch": "partial_update",
+                "delete": "destroy",
+            }
+        ),
+        name="category_detail",
+    ),
+    # URL pública para lista de categorías
+    path(
+        "public_list/",
+        CategoryViewSet.as_view({"get": "public_list"}),
+        name="category_public_list",
+    ),
 ]

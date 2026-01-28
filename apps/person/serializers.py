@@ -1,18 +1,24 @@
-#person/serializer.py
+# person/serializer.py
 from django.contrib.auth import get_user_model
-from rest_framework import serializers
-from .models import Person
-from django.db import transaction
-from rest_framework.authtoken.models import Token
 from django.contrib.auth.models import Group
+from django.db import transaction
+from rest_framework import serializers
+from rest_framework.authtoken.models import Token
+
+from .models import Person
 
 User = get_user_model()
+
+
+class UserLoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
 
 class PersonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Person
-        fields = ['name','last_name','dni','city']
-
+        fields = ["name", "last_name", "dni", "city"]
 
 
 class UserRegistrationSerializer(serializers.Serializer):
@@ -25,17 +31,17 @@ class UserRegistrationSerializer(serializers.Serializer):
         if User.objects.filter(username=value).exists():
             raise serializers.ValidationError("Ese usuario ya existe")
         return value
-    
+
     @transaction.atomic
     def create(self, validated_data):
         # Datos de la persona
-        person_data = validated_data.pop('persona')
+        person_data = validated_data.pop("persona")
 
         # Crear usuario
         user = User.objects.create_user(
-            username=validated_data['username'],
-            email=validated_data['email'],
-            password=validated_data['password']
+            username=validated_data["username"],
+            email=validated_data["email"],
+            password=validated_data["password"],
         )
 
         # Asignar al grupo visitante
