@@ -204,7 +204,3 @@ Para desarrollo local sin Docker:
 5. Ejecutar migraciones: `python manage.py migrate`
 6. Crear usuarios: `python manage.py create_test_users`
 7. Ejecutar servidor: `python manage.py runserver`
-
-## Licencia
-
-Este proyecto está bajo la Licencia MIT.
