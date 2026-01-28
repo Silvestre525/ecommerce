@@ -1,18 +1,22 @@
-# 🛍️ Ecommerce API
+# Ecommerce API
 
 API REST completa para sistema de ecommerce desarrollada con Django REST Framework.
 
-## 📋 Características
+## Características principales
 
-- **Autenticación por tokens** con roles diferenciados
-- **Sistema de permisos** granular (Administrador/Visitante)
-- **Catálogo de productos** con filtrado y búsqueda
-- **Gestión de categorías** y proveedores
-- **Sistema de órdenes/pedidos** con permisos por propietario
-- **Datos geográficos** para direcciones
-- **Documentación automática** con Swagger/OpenAPI
+- Autenticación por tokens con roles diferenciados
+- Sistema de permisos granular (Administrador/Visitante)
+- Catálogo de productos con filtrado y búsqueda
+- Gestión de categorías y proveedores
+- Sistema de órdenes/pedidos con permisos por propietario
+- Datos geográficos para direcciones
+- Documentación automática con Swagger/OpenAPI
 
-## 🚀 Instalación y Configuración
+## Instalación rápida con Docker
+
+### Requisitos previos
+- Docker
+- Docker Compose
 
 ### 1. Clonar el repositorio
 ```bash
@@ -20,233 +24,139 @@ git clone <url-del-repo>
 cd ecommerce
 ```
 
-### 2. Crear entorno virtual
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# o
-venv\Scripts\activate     # Windows
-```
-
-### 3. Instalar dependencias
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configurar base de datos
+### 2. Configurar variables de entorno
 Crear archivo `.env` en la raíz del proyecto:
 ```env
-DB_NAME=tu_db_name
-DB_USER=tu_db_user
-DB_PASSWORD=tu_db_password
-DB_HOST=localhost
-DB_PORT=5432
+DB_NAME=ecommerce_db
+DB_USER=postgres
+DB_PASSWORD=postgres123
 ```
 
-### 5. Ejecutar migraciones
+### 3. Levantar el proyecto
 ```bash
-python manage.py migrate
+docker-compose up -d
 ```
 
-### 6. Crear grupos y usuarios de prueba
+### 4. Crear usuarios de prueba
 ```bash
-python manage.py init_groups
-python manage.py create_test_users
+docker-compose exec web python manage.py init_groups
+docker-compose exec web python manage.py create_test_users
 ```
 
-### 7. Ejecutar servidor
-```bash
-python manage.py runserver
-```
+La API estará disponible en: http://localhost:8000
 
-## 📚 Documentación de la API
+## Documentación de la API
 
-### 🌐 Acceso a Swagger UI
-- **Swagger UI**: http://127.0.0.1:8000/api/docs/
-- **ReDoc**: http://127.0.0.1:8000/api/redoc/
-- **Schema JSON**: http://127.0.0.1:8000/api/schema/
+- **Swagger UI**: http://localhost:8000/api/docs/
+- **ReDoc**: http://localhost:8000/api/redoc/
+- **Schema JSON**: http://localhost:8000/api/schema/
 
-## 👥 Roles y Permisos
+## Usuarios de prueba
 
-### 🔑 Sistema de Autenticación
-La API utiliza **Token Authentication**. Para acceder a endpoints protegidos:
+Después de ejecutar el comando de creación de usuarios tendrás:
 
-1. Obtén un token: `POST /api/login/`
-2. Incluye el token en el header: `Authorization: Token tu_token_aqui`
+**Administrador:**
+- Username: `admin_test`
+- Password: `admin123`
+- Permisos: Acceso completo
 
-### 👤 Roles de Usuario
+**Visitante:**
+- Username: `visitante_test`
+- Password: `visitante123`
+- Permisos: Solo lectura + gestión de sus propias órdenes
 
-#### **🌐 Público** (sin autenticación)
-- ✅ Ver catálogo de productos básico
-- ✅ Ver lista de categorías
-- ✅ Consultar ubicaciones geográficas
+## Roles y permisos
 
-#### **👋 Visitante** (usuario registrado)
-- ✅ Todo lo público +
-- ✅ Ver catálogo completo de productos
-- ✅ Ver detalles de productos
-- ✅ Ver proveedores
-- ✅ Crear sus propias órdenes
-- ✅ Ver solo sus órdenes
-- ✅ Ver su perfil
-- ❌ Modificar productos, categorías o proveedores
+### Público (sin autenticación)
+- Ver catálogo básico de productos
+- Ver categorías
+- Consultar ubicaciones geográficas
 
-#### **⚡ Administrador** (usuario admin)
-- ✅ Todo lo del visitante +
-- ✅ Crear/editar/eliminar productos
-- ✅ Crear/editar/eliminar categorías
-- ✅ Crear/editar/eliminar proveedores
-- ✅ Ver todas las órdenes del sistema
-- ✅ Eliminar órdenes
+### Visitante (usuario registrado)
+- Todo lo público más:
+- Ver catálogo completo de productos
+- Ver proveedores
+- Crear y ver sus propias órdenes
+- Ver su perfil
 
-## 📊 Endpoints Principales
+### Administrador
+- Todo lo del visitante más:
+- Gestión completa de productos, categorías y proveedores
+- Ver todas las órdenes del sistema
+- Eliminar órdenes
 
-### 🔐 Autenticación
-| Endpoint | Método | Descripción | Acceso |
-|----------|--------|-------------|--------|
-| `/api/register/` | POST | Registrar nuevo usuario | Público |
-| `/api/login/` | POST | Iniciar sesión | Público |
-| `/api/profile/` | GET | Ver perfil de usuario | Autenticado |
+## Endpoints principales
 
-### 🛍️ Productos
-| Endpoint | Método | Descripción | Permisos |
-|----------|--------|-------------|----------|
-| `/api/product/` | GET, POST | Listar/Crear productos | GET: Visitante+, POST: Admin |
-| `/api/product/{id}/` | GET, PUT, DELETE | Ver/Editar/Eliminar | GET: Visitante+, PUT/DELETE: Admin |
-| `/api/product/public_catalog/` | GET | Catálogo público básico | Público |
-
-### 📂 Categorías
-| Endpoint | Método | Descripción | Permisos |
-|----------|--------|-------------|----------|
-| `/api/category/` | GET, POST | Listar/Crear categorías | GET: Visitante+, POST: Admin |
-| `/api/category/{id}/` | GET, PUT, DELETE | Ver/Editar/Eliminar | GET: Visitante+, PUT/DELETE: Admin |
-| `/api/category/public_list/` | GET | Lista pública | Público |
-
-### 🏢 Proveedores
-| Endpoint | Método | Descripción | Permisos |
-|----------|--------|-------------|----------|
-| `/api/suppliers/` | GET, POST | Listar/Crear proveedores | GET: Visitante+, POST: Admin |
-| `/api/suppliers/{id}/` | GET, PUT, DELETE | Ver/Editar/Eliminar | GET: Visitante+, PUT/DELETE: Admin |
-
-### 📋 Órdenes
-| Endpoint | Método | Descripción | Permisos |
-|----------|--------|-------------|----------|
-| `/api/order/` | GET, POST | Listar/Crear órdenes | Admin: todas, Visitante: propias |
-| `/api/order/{id}/` | GET, PUT, DELETE | Ver/Editar/Eliminar | Propietario o Admin |
-| `/api/order/my_orders/` | GET | Mis órdenes | Visitante+ |
-
-### 🌍 Geografía
-| Endpoint | Método | Descripción | Permisos |
-|----------|--------|-------------|----------|
-| `/api/geo/countries/` | GET | Lista de países | Público |
-| `/api/geo/provinces/?country_id=1` | GET | Provincias por país | Público |
-| `/api/geo/cities/?province_id=1` | GET | Ciudades por provincia | Público |
-
-## 🧪 Usuarios de Prueba
-
-El comando `python manage.py create_test_users` crea estos usuarios:
-
-### 👑 Administrador
-- **Username**: `admin_test`
-- **Password**: `admin123`
-- **Rol**: Administrador
-- **Permisos**: Acceso completo
-
-### 👤 Visitante
-- **Username**: `visitante_test`
-- **Password**: `visitante123`
-- **Rol**: Visitante
-- **Permisos**: Solo lectura + gestión de propias órdenes
-
-### 👥 Usuario Normal
-- **Username**: `user_normal`
-- **Password**: `user123`
-- **Rol**: Visitante
-- **Permisos**: Solo lectura + gestión de propias órdenes
-
-## 🔧 Ejemplos de Uso
-
-### 1. Obtener Token de Autenticación
-```bash
-curl -X POST http://127.0.0.1:8000/api/login/ \
-  -H "Content-Type: application/json" \
-  -d '{
-    "username": "admin_test",
-    "password": "admin123"
-  }'
-```
-
-**Respuesta:**
-```json
-{
-  "token": "9340ff6d6806e7dc37d7...",
-  "user_id": 1,
-  "username": "admin_test",
-  "message": "Login successful"
-}
-```
-
-### 2. Listar Productos (con autenticación)
-```bash
-curl -H "Authorization: Token 9340ff6d6806e7dc37d7..." \
-  http://127.0.0.1:8000/api/product/
-```
-
-### 3. Ver Catálogo Público (sin autenticación)
-```bash
-curl http://127.0.0.1:8000/api/product/public_catalog/
-```
-
-### 4. Crear Producto (solo admin)
-```bash
-curl -X POST http://127.0.0.1:8000/api/product/ \
-  -H "Authorization: Token tu_token_admin" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Producto Test",
-    "stock": 10,
-    "color": 1,
-    "size": 1
-  }'
-```
-
-### 5. Crear Orden (visitante)
-```bash
-curl -X POST http://127.0.0.1:8000/api/order/ \
-  -H "Authorization: Token tu_token_visitante" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "total": 199.99
-  }'
-```
-
-## 🔍 Filtrado y Búsqueda
+### Autenticación
+- `POST /api/register/` - Registrar usuario
+- `POST /api/login/` - Iniciar sesión
+- `GET /api/profile/` - Ver perfil
 
 ### Productos
-```bash
-# Buscar por nombre
-GET /api/product/?search=camiseta
-
-# Filtrar por categoría
-GET /api/product/?categories=1
-
-# Ordenar por stock
-GET /api/product/?ordering=stock
-
-# Combinado
-GET /api/product/?search=deportiva&categories=2&ordering=name
-```
+- `GET /api/product/` - Listar productos (autenticado)
+- `GET /api/product/public_catalog/` - Catálogo público
+- `POST /api/product/` - Crear producto (admin)
 
 ### Categorías
-```bash
-# Buscar por nombre o descripción
-GET /api/category/?search=ropa
+- `GET /api/category/` - Listar categorías (autenticado)
+- `GET /api/category/public_list/` - Lista pública
+- `POST /api/category/` - Crear categoría (admin)
 
-# Ordenar alfabéticamente
-GET /api/category/?ordering=name
+### Órdenes
+- `GET /api/order/` - Listar órdenes
+- `POST /api/order/` - Crear orden
+- `GET /api/order/my_orders/` - Mis órdenes
+
+## Ejemplos de uso
+
+### 1. Obtener token de autenticación
+```bash
+curl -X POST http://localhost:8000/api/login/ \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin_test", "password": "admin123"}'
 ```
 
-## 🏗️ Arquitectura del Proyecto
+### 2. Listar productos con autenticación
+```bash
+curl -H "Authorization: Token tu_token_aqui" \
+  http://localhost:8000/api/product/
+```
+
+### 3. Ver catálogo público
+```bash
+curl http://localhost:8000/api/product/public_catalog/
+```
+
+## Comandos útiles
+
+### Para desarrollo
+```bash
+# Ver logs
+docker-compose logs -f
+
+# Acceder al contenedor
+docker-compose exec web bash
+
+# Ejecutar migraciones
+docker-compose exec web python manage.py migrate
+
+# Crear superusuario
+docker-compose exec web python manage.py createsuperuser
+
+# Parar el proyecto
+docker-compose down
+```
+
+### Reset de datos de prueba
+```bash
+# Reset usuarios
+docker-compose exec web python manage.py create_test_users --reset
+
+# Reset grupos y permisos
+docker-compose exec web python manage.py init_groups --reset
+```
+
+## Estructura del proyecto
 
 ```
 ecommerce/
@@ -258,73 +168,43 @@ ecommerce/
 │   ├── product/          # Catálogo de productos
 │   ├── suppliers/        # Gestión de proveedores
 │   └── utils/            # Permisos y utilidades
-├── ecommerce/            # Configuración principal
-├── logs/                 # Archivos de log (ignorados por git)
-└── requirements.txt      # Dependencias
+├── ecommerce/            # Configuración Django
+├── docker-compose.yml    # Configuración Docker
+├── Dockerfile           # Imagen de la aplicación
+└── requirements.txt     # Dependencias Python
 ```
 
-## 🛠️ Comandos Útiles
+## Solución de problemas
 
-```bash
-# Crear grupos y permisos
-python manage.py init_groups
+### La aplicación no inicia
+- Verificar que Docker esté ejecutándose
+- Comprobar que el archivo `.env` existe y tiene los valores correctos
+- Revisar logs: `docker-compose logs`
 
-# Crear usuarios de prueba
-python manage.py create_test_users
+### Error de conexión a la base de datos
+- Esperar unos segundos para que PostgreSQL termine de inicializar
+- Verificar que las variables del `.env` coincidan en todos los servicios
 
-# Reset usuarios de prueba
-python manage.py create_test_users --reset
+### Problemas de permisos
+- Verificar que el token esté en el header: `Authorization: Token tu_token`
+- Confirmar el rol del usuario con el comando de usuarios de prueba
 
-# Reset grupos y permisos
-python manage.py init_groups --reset
+### Token inválido
+- El token puede haber expirado
+- Hacer login nuevamente: `POST /api/login/`
 
-# Generar schema de API
-python manage.py spectacular --color --file schema.yml
+## Desarrollo
 
-# Ver logs en tiempo real (si están configurados)
-tail -f logs/ecommerce.log
-```
+Para desarrollo local sin Docker:
 
-## 🐛 Solución de Problemas
+1. Crear entorno virtual: `python -m venv venv`
+2. Activar entorno: `source venv/bin/activate`
+3. Instalar dependencias: `pip install -r requirements.txt`
+4. Configurar base de datos PostgreSQL
+5. Ejecutar migraciones: `python manage.py migrate`
+6. Crear usuarios: `python manage.py create_test_users`
+7. Ejecutar servidor: `python manage.py runserver`
 
-### Error: "Unable to log in with provided credentials"
-- Verifica username y password
-- Asegúrate de que el usuario existe: `python manage.py create_test_users`
-
-### Error: Permission denied
-- Verifica que el token esté en el header: `Authorization: Token tu_token`
-- Confirma que el usuario tenga los permisos necesarios
-- Los administradores pueden acceder a todo
-- Los visitantes solo a endpoints de lectura y sus propias órdenes
-
-### Error: Token inválido
-- El token puede haber expirado o ser incorrecto
-- Haz login nuevamente: `POST /api/login/`
-
-## 🚀 Próximas Funcionalidades
-
-- [ ] Dashboard de administración con estadísticas
-- [ ] Sistema de inventario avanzado
-- [ ] Notificaciones por email
-- [ ] Carrito de compras persistente
-- [ ] Sistema de pagos
-- [ ] API de envíos
-- [ ] Sistema de reviews y calificaciones
-
-## 📝 Licencia
+## Licencia
 
 Este proyecto está bajo la Licencia MIT.
-
-## 🤝 Contribuciones
-
-Las contribuciones son bienvenidas. Por favor:
-
-1. Haz fork del proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
-
-## 📧 Contacto
-
-Para preguntas o soporte, contacta al equipo de desarrollo.
