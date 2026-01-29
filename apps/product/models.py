@@ -17,8 +17,8 @@ class Product(BaseModel):
     id = models.AutoField(primary_key=True, db_column="id_product")
     name = models.CharField(
         "Nombre del producto",
-        max_length=100,  # Aumentado para más flexibilidad
-        null=True,  # Mantenemos null=True por ahora para evitar problemas de migración
+        max_length=100,
+        null=True,
         blank=False,
         help_text="Nombre del producto (máximo 100 caracteres)",
     )
@@ -28,7 +28,7 @@ class Product(BaseModel):
     )
     img = models.CharField(
         "URL de imagen",
-        max_length=200,  # Aumentado de 100 a 200
+        max_length=200,
         null=True,
         blank=True,
         help_text="URL de la imagen del producto",
@@ -55,13 +55,13 @@ class Product(BaseModel):
     )
     color = models.ForeignKey(
         Color,
-        on_delete=models.PROTECT,  # Más seguro que CASCADE
+        on_delete=models.PROTECT,
         default=1,
         help_text="Color del producto",
     )
     size = models.ForeignKey(
         Size,
-        on_delete=models.PROTECT,  # Más seguro que CASCADE
+        on_delete=models.PROTECT,
         default=1,
         help_text="Tamaño del producto",
     )
@@ -88,18 +88,6 @@ class Product(BaseModel):
             models.Index(fields=["size"], name="product_size_idx"),
             models.Index(fields=["creation_date"], name="product_created_idx"),
         ]
-
-        # Constraints para integridad de datos (comentados temporalmente)
-        # constraints = [
-        #     models.CheckConstraint(
-        #         check=models.Q(stock__gte=0), name="product_positive_stock"
-        #     ),
-        #     models.UniqueConstraint(
-        #         fields=["name", "color", "size"],
-        #         name="unique_product_variant",
-        #         condition=models.Q(is_active=True),
-        #     ),
-        # ]
 
     def __str__(self):
         """Representación string del producto"""
