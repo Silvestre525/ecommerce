@@ -7,6 +7,7 @@ from ..color.models import Color
 from ..order.models import Order
 from ..size.models import Size
 from ..suppliers.models import Suppliers
+from .managers import ProductManager
 
 
 class Product(BaseModel):
@@ -72,6 +73,8 @@ class Product(BaseModel):
         default=True,
         help_text="Indica si el producto está disponible para la venta",
     )
+
+    objects = ProductManager()
 
     class Meta:
         db_table = "Product"
@@ -185,19 +188,3 @@ class Product(BaseModel):
         """Activa el producto"""
         self.is_active = True
         self.save()
-
-    # Métodos de clase útiles
-    @classmethod
-    def get_available_products(cls):
-        """Devuelve productos disponibles (activos y con stock)"""
-        return cls.objects.filter(is_active=True, stock__gt=0)
-
-    @classmethod
-    def get_low_stock_products(cls, threshold=10):
-        """Devuelve productos con stock bajo"""
-        return cls.objects.filter(is_active=True, stock__lt=threshold, stock__gt=0)
-
-    @classmethod
-    def get_out_of_stock_products(cls):
-        """Devuelve productos sin stock"""
-        return cls.objects.filter(is_active=True, stock=0)
