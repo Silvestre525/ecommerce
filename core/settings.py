@@ -15,7 +15,7 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-from ecommerce.apps_list import APPS
+from core.apps_list import APPS
 
 # Carga el archivo .env (busca en la raíz del proyecto)
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
@@ -54,7 +54,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-ROOT_URLCONF = "ecommerce.urls"
+ROOT_URLCONF = "core.urls"
 
 TEMPLATES = [
     {
@@ -71,7 +71,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = "ecommerce.wsgi.application"
+WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Database
