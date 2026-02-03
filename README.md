@@ -12,7 +12,9 @@ API REST completa para sistema de ecommerce desarrollada con Django REST Framewo
 - Datos geográficos para direcciones
 - Documentación automática con Swagger/OpenAPI
 
-## Instalación rápida con Docker
+## Instalación (Recomendada)
+
+Se recomienda encarecidamente utilizar **Docker Compose** para levantar el proyecto, ya que configura automáticamente la base de datos (PostgreSQL) y el servicio de caché (Redis). La instalación manual local requiere configuraciones complejas adicionales.
 
 ### Requisitos previos
 - Docker
@@ -30,6 +32,11 @@ Crear archivo `.env` en la raíz del proyecto:
 DB_NAME=ecommerce_db
 DB_USER=postgres
 DB_PASSWORD=postgres123
+
+# Configuración para Docker
+REDIS_HOST=django_redis
+REDIS_PORT=6379
+CHANNELS_ALLOWED_ORIGINS=http://localhost:3000
 ```
 
 ### 3. Levantar el proyecto
@@ -193,14 +200,14 @@ ecommerce/
 - El token puede haber expirado
 - Hacer login nuevamente: `POST /api/login/`
 
-## Desarrollo
+## Instalación Manual (Avanzada)
 
-Para desarrollo local sin Docker:
+⚠️ **Nota:** Este método requiere que tengas instalados y configurados **PostgreSQL** y **Redis** en tu máquina local.
 
 1. Crear entorno virtual: `python -m venv venv`
 2. Activar entorno: `source venv/bin/activate`
 3. Instalar dependencias: `pip install -r requirements.txt`
-4. Configurar base de datos PostgreSQL
+4. Configurar variables en `.env` (usar `localhost` para DB y Redis)
 5. Ejecutar migraciones: `python manage.py migrate`
 6. Crear usuarios: `python manage.py create_test_users`
 7. Ejecutar servidor: `python manage.py runserver`
