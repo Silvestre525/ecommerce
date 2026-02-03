@@ -25,6 +25,10 @@ services:
       - DB_PASSWORD=${DB_PASSWORD}
       - DB_HOST=db
       - DB_PORT=5432
+      - SECRET_KEY=${SECRET_KEY}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - CHANNELS_ALLOWED_ORIGINS=${CHANNELS_ALLOWED_ORIGINS}
     depends_on:
       - django_redis
       - db

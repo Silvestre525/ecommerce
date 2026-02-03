@@ -31,7 +31,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-bl6k=l3fgn+1_ox6_u%fp2)v^osk)sbh13hjdurbn3=35j5cy+"
+SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-default-key-change-me")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -250,11 +250,14 @@ REST_FRAMEWORK = {
 }
 
 # Settings channel for reddis
+REDIS_HOST = os.getenv("REDIS_HOST", "django_redis")
+REDIS_PORT = os.getenv("REDIS_PORT", "6379")
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("django_redis", 6379)],
+            "hosts": [(REDIS_HOST, int(REDIS_PORT))],
         },
     },
 }
@@ -262,11 +265,13 @@ CHANNEL_LAYERS = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://django_redis:6379/1",
+        "LOCATION": f"redis://{REDIS_HOST}:{REDIS_PORT}/1",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     },
 }
 # Para que el front pueda acceder
-CHANNELS_ALLOWED_ORIGINS = ["http://localhost:3000"]
+CHANNELS_ALLOWED_ORIGINS = os.getenv(
+    "CHANNELS_ALLOWED_ORIGINS", "http://localhost:3000"
+).split(",")
