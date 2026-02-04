@@ -9,6 +9,7 @@ iniconfig==2.1.0
 jsonschema==4.25.1
 jsonschema-specifications==2025.9.1
 packaging==25.0
+Pillow==12.1.0
 pluggy==1.6.0
 psycopg2-binary==2.9.10
 Pygments==2.19.2
@@ -23,8 +24,9 @@ sqlparse==0.5.3
 typing_extensions==4.15.0
 uritemplate==4.2.0
 uvicorn==0.32.0
-channels==4.2.0
-channels-redis==4.2.0
-daphne==4.1.0
-django-redis==5.4.0
+channels==4.3.2
+channels-redis==4.3.0
+daphne==4.2.1
+django-redis==6.0.0
 django-filter==24.2
+whitenoise==6.11.0

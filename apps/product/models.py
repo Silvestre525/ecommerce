@@ -27,12 +27,12 @@ class Product(BaseModel):
         "Stock disponible",
         help_text="Cantidad en stock (debe ser 0 o mayor)",
     )
-    img = models.CharField(
-        "URL de imagen",
-        max_length=200,
+    img = models.ImageField(
+        "Imagen del producto",
+        upload_to="products/",
         null=True,
         blank=True,
-        help_text="URL de la imagen del producto",
+        help_text="Imagen del producto",
     )
 
     # Relaciones
