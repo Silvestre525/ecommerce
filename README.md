@@ -1,213 +1,76 @@
-# Ecommerce API
+# Ecommerce API 👕🚀
 
-API REST completa para sistema de ecommerce desarrollada con Django REST Framework.
+API REST robusta para un sistema de ecommerce de indumentaria, desarrollada con **Django REST Framework**. Diseñada para integrarse fácilmente con frontends modernos (React, Angular, Vue) gestionando el carrito localmente.
 
-## Características principales
+## ✨ Características principales
 
-- Autenticación por tokens con roles diferenciados
-- Sistema de permisos granular (Administrador/Visitante)
-- Catálogo de productos con filtrado y búsqueda
-- Gestión de categorías y proveedores
-- Sistema de órdenes/pedidos con permisos por propietario
-- Datos geográficos para direcciones
-- Documentación automática con Swagger/OpenAPI
+- **Seguridad en Precios**: El backend calcula automáticamente los totales de las órdenes basándose en precios de base de datos (evita manipulación del cliente).
+- **Historial de Precios**: Registro del precio de compra en cada ítem de la orden (`DetailOrder`).
+- **Gestión de Stock Atómica**: Control de inventario en tiempo real con validación previa a la venta.
+- **Autenticación Robusta**: Tokens con roles diferenciados (Administrador/Visitante).
+- **Sistema Geográfico**: Soporte para direcciones con Countries, Provinces y Cities.
+- **Documentación Completa**: OpenAPI/Swagger y [Guía de Lógica de Negocio](./docs/api_guide.md).
 
-## Instalación (Recomendada)
+## 🛠️ Instalación (Recomendada con Docker)
 
-Se recomienda encarecidamente utilizar **Docker Compose** para levantar el proyecto, ya que configura automáticamente la base de datos (PostgreSQL) y el servicio de caché (Redis). La instalación manual local requiere configuraciones complejas adicionales.
-
-### Requisitos previos
-- Docker
-- Docker Compose
-
-### 1. Clonar el repositorio
+### 1. Clonar y Configurar
 ```bash
 git clone <url-del-repo>
 cd ecommerce
+cp .env.example .env  # Asegúrate de configurar tus variables
 ```
 
-### 2. Configurar variables de entorno
-Crear archivo `.env` en la raíz del proyecto:
-```env
-DB_NAME=ecommerce_db
-DB_USER=postgres
-DB_PASSWORD=postgres123
-
-# Configuración para Docker
-REDIS_HOST=django_redis
-REDIS_PORT=6379
-CHANNELS_ALLOWED_ORIGINS=http://localhost:3000
-```
-
-### 3. Levantar el proyecto
+### 2. Levantar el Entorno
 ```bash
-docker-compose up -d
+docker compose up -d --build
 ```
 
-### 4. Crear usuarios de prueba
+### 3. Cargar Datos de Prueba (Recomendado)
+Este comando configura grupos, usuarios, productos, precios, talles y proveedores en un solo paso:
 ```bash
-docker-compose exec web python manage.py init_groups
-docker-compose exec web python manage.py create_test_users
+docker compose exec web python manage.py load_sample_data --clear
 ```
 
-La API estará disponible en: http://localhost:8000
+La API estará disponible en: [http://localhost:8000](http://localhost:8000)
 
-## Documentación de la API
+## 📖 Documentación
 
-- **Swagger UI**: http://localhost:8000/api/docs/
-- **ReDoc**: http://localhost:8000/api/redoc/
-- **Schema JSON**: http://localhost:8000/api/schema/
+- **Guía de Desarrollo y Frontend**: [docs/api_guide.md](./docs/api_guide.md) (Lógica de negocio y flujos).
+- **Swagger UI**: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
+- **ReDoc**: [http://localhost:8000/api/redoc/](http://localhost:8000/api/redoc/)
 
-## Usuarios de prueba
+## 👥 Usuarios de prueba (Cargados con `load_sample_data`)
 
-Después de ejecutar el comando de creación de usuarios tendrás:
+| Rol | Username | Password | Permisos |
+| :--- | :--- | :--- | :--- |
+| **Administrador** | `admin` | `admin123` | Control total del catálogo y órdenes |
+| **Visitante** | `visitor` | `visitor123` | Compra de productos y ver órdenes propias |
 
-**Administrador:**
-- Username: `admin_test`
-- Password: `admin123`
-- Permisos: Acceso completo
+## 📐 Estructura del Proyecto
 
-**Visitante:**
-- Username: `visitante_test`
-- Password: `visitante123`
-- Permisos: Solo lectura + gestión de sus propias órdenes
-
-## Roles y permisos
-
-### Público (sin autenticación)
-- Ver catálogo básico de productos
-- Ver categorías
-- Consultar ubicaciones geográficas
-
-### Visitante (usuario registrado)
-- Todo lo público más:
-- Ver catálogo completo de productos
-- Ver proveedores
-- Crear y ver sus propias órdenes
-- Ver su perfil
-
-### Administrador
-- Todo lo del visitante más:
-- Gestión completa de productos, categorías y proveedores
-- Ver todas las órdenes del sistema
-- Eliminar órdenes
-
-## Endpoints principales
-
-### Autenticación
-- `POST /api/register/` - Registrar usuario
-- `POST /api/login/` - Iniciar sesión
-- `GET /api/profile/` - Ver perfil
-
-### Productos
-- `GET /api/product/` - Listar productos (autenticado)
-- `GET /api/product/public_catalog/` - Catálogo público
-- `POST /api/product/` - Crear producto (admin)
-
-### Categorías
-- `GET /api/category/` - Listar categorías (autenticado)
-- `GET /api/category/public_list/` - Lista pública
-- `POST /api/category/` - Crear categoría (admin)
-
-### Órdenes
-- `GET /api/order/` - Listar órdenes
-- `POST /api/order/` - Crear orden
-- `GET /api/order/my_orders/` - Mis órdenes
-
-## Ejemplos de uso
-
-### 1. Obtener token de autenticación
-```bash
-curl -X POST http://localhost:8000/api/login/ \
-  -H "Content-Type: application/json" \
-  -d '{"username": "admin_test", "password": "admin123"}'
-```
-
-### 2. Listar productos con autenticación
-```bash
-curl -H "Authorization: Token tu_token_aqui" \
-  http://localhost:8000/api/product/
-```
-
-### 3. Ver catálogo público
-```bash
-curl http://localhost:8000/api/product/public_catalog/
-```
-
-## Comandos útiles
-
-### Para desarrollo
-```bash
-# Ver logs
-docker-compose logs -f
-
-# Acceder al contenedor
-docker-compose exec web bash
-
-# Ejecutar migraciones
-docker-compose exec web python manage.py migrate
-
-# Crear superusuario
-docker-compose exec web python manage.py createsuperuser
-
-# Parar el proyecto
-docker-compose down
-```
-
-### Reset de datos de prueba
-```bash
-# Reset usuarios
-docker-compose exec web python manage.py create_test_users --reset
-
-# Reset grupos y permisos
-docker-compose exec web python manage.py init_groups --reset
-```
-
-## Estructura del proyecto
-
-```
+```text
 ecommerce/
 ├── apps/
-│   ├── category/          # Gestión de categorías
-│   ├── geo/              # Países, provincias, ciudades
-│   ├── order/            # Sistema de órdenes
-│   ├── person/           # Usuarios y autenticación
-│   ├── product/          # Catálogo de productos
-│   ├── suppliers/        # Gestión de proveedores
-│   └── utils/            # Permisos y utilidades
-├── ecommerce/            # Configuración Django
-├── docker-compose.yml    # Configuración Docker
-├── Dockerfile           # Imagen de la aplicación
-└── requirements.txt     # Dependencias Python
+│   ├── category/      # Organización de productos
+│   ├── order/         # Lógica de pedidos y DetailOrder (Detalles)
+│   ├── person/        # Perfiles de usuario y Auth
+│   ├── product/       # Catálogo con Variantes (Talla/Color) y Stock
+│   ├── suppliers/     # Gestión de proveedores
+│   └── geo/           # Datos de ubicación
+├── core/              # Configuración global de Django/ASGI/WSGI
+├── docs/              # Manuales de integración y lógica
+└── docker-compose.yml # Orquestación de contenedores (Web, DB, Redis)
 ```
 
-## Solución de problemas
+## 🛠️ Comandos útiles
 
-### La aplicación no inicia
-- Verificar que Docker esté ejecutándose
-- Comprobar que el archivo `.env` existe y tiene los valores correctos
-- Revisar logs: `docker-compose logs`
+```bash
+# Ver logs del servidor
+docker compose logs -f web
 
-### Error de conexión a la base de datos
-- Esperar unos segundos para que PostgreSQL termine de inicializar
-- Verificar que las variables del `.env` coincidan en todos los servicios
+# Acceder a la consola de Django
+docker compose exec web python manage.py shell
 
-### Problemas de permisos
-- Verificar que el token esté en el header: `Authorization: Token tu_token`
-- Confirmar el rol del usuario con el comando de usuarios de prueba
-
-### Token inválido
-- El token puede haber expirado
-- Hacer login nuevamente: `POST /api/login/`
-
-## Instalación Manual (Avanzada)
-
-⚠️ **Nota:** Este método requiere que tengas instalados y configurados **PostgreSQL** y **Redis** en tu máquina local.
-
-1. Crear entorno virtual: `python -m venv venv`
-2. Activar entorno: `source venv/bin/activate`
-3. Instalar dependencias: `pip install -r requirements.txt`
-4. Configurar variables en `.env` (usar `localhost` para DB y Redis)
-5. Ejecutar migraciones: `python manage.py migrate`
-6. Crear usuarios: `python manage.py create_test_users`
-7. Ejecutar servidor: `python manage.py runserver`
+# Reiniciar base de datos y datos de prueba
+docker compose exec web python manage.py load_sample_data --clear
+```
