@@ -200,6 +200,10 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Ensure logs directory exists
+LOGS_DIR = BASE_DIR / "logs"
+LOGS_DIR.mkdir(parents=True, exist_ok=True)
+
 # Logging configuration
 LOGGING = {
     "version": 1,
@@ -221,7 +225,7 @@ LOGGING = {
         },
         "file": {
             "class": "logging.FileHandler",
-            "filename": BASE_DIR / "logs" / "ecommerce.log",
+            "filename": LOGS_DIR / "ecommerce.log",
             "formatter": "verbose",
         },
     },
