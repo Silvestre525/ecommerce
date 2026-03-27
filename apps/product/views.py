@@ -271,7 +271,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     )
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def public_catalog(self, request):
-        products = Product.get_available_products()[:20]
+        products = Product.objects.get_available_products()[:20]
         serializer = ProductPublicSerializer(products, many=True)
 
         return Response(
@@ -301,7 +301,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=["get"])
     def low_stock(self, request):
         threshold = int(request.query_params.get("threshold", 10))
-        products = Product.get_low_stock_products(threshold)
+        products = Product.objects.get_low_stock_products(threshold)
         serializer = ProductListSerializer(products, many=True)
 
         return Response(
@@ -321,7 +321,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     )
     @action(detail=False, methods=["get"])
     def out_of_stock(self, request):
-        products = Product.get_out_of_stock_products()
+        products = Product.objects.get_out_of_stock_products()
         serializer = ProductListSerializer(products, many=True)
 
         return Response(

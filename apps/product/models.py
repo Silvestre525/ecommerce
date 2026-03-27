@@ -27,6 +27,13 @@ class Product(BaseModel):
         "Stock disponible",
         help_text="Cantidad en stock (debe ser 0 o mayor)",
     )
+    price = models.DecimalField(
+        "Precio",
+        max_digits=10,
+        decimal_places=2,
+        default=0.00,
+        help_text="Precio unitario del producto",
+    )
     img = models.ImageField(
         "Imagen del producto",
         upload_to="products/",
@@ -47,12 +54,6 @@ class Product(BaseModel):
         related_name="products",
         blank=True,
         help_text="Proveedores del producto",
-    )
-    order = models.ManyToManyField(
-        Order,
-        related_name="products",
-        blank=True,
-        help_text="Órdenes que incluyen este producto",
     )
     color = models.ForeignKey(
         Color,

@@ -329,6 +329,7 @@ class Command(BaseCommand):
                 product = Product.objects.create(
                     name=name,
                     stock=stock,
+                    price=price_hint,
                     img=img_url,
                     color=color,
                     size=size,
@@ -360,13 +361,13 @@ class Command(BaseCommand):
         self.stdout.write(f"🏭 Proveedores: {Suppliers.objects.count()}")
         self.stdout.write(f"📦 Productos: {Product.objects.count()}")
         self.stdout.write(
-            f"   ├─ Disponibles: {Product.get_available_products().count()}"
+            f"   ├─ Disponibles: {Product.objects.get_available_products().count()}"
         )
         self.stdout.write(
-            f"   ├─ Stock bajo: {Product.get_low_stock_products().count()}"
+            f"   ├─ Stock bajo: {Product.objects.get_low_stock_products().count()}"
         )
         self.stdout.write(
-            f"   └─ Sin stock: {Product.get_out_of_stock_products().count()}"
+            f"   └─ Sin stock: {Product.objects.get_out_of_stock_products().count()}"
         )
 
         self.stdout.write(self.style.SUCCESS("\n🔗 USUARIOS DE PRUEBA:"))
