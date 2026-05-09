@@ -1,8 +1,8 @@
-# Ecommerce API 👕🚀
+# Ecommerce API 
 
 API REST robusta para un sistema de ecommerce de indumentaria, desarrollada con **Django REST Framework**. Diseñada para integrarse fácilmente con frontends modernos (React, Angular, Vue) gestionando el carrito localmente.
 
-## ✨ Características principales
+## Características principales
 
 - **Seguridad en Precios**: El backend calcula automáticamente los totales de las órdenes basándose en precios de base de datos (evita manipulación del cliente).
 - **Historial de Precios**: Registro del precio de compra en cada ítem de la orden (`DetailOrder`).
@@ -11,7 +11,7 @@ API REST robusta para un sistema de ecommerce de indumentaria, desarrollada con 
 - **Sistema Geográfico**: Soporte para direcciones con Countries, Provinces y Cities.
 - **Documentación Completa**: OpenAPI/Swagger y [Guía de Lógica de Negocio](./docs/api_guide.md).
 
-## 🛠️ Instalación (Recomendada con Docker)
+## Instalación (Recomendada con Docker)
 
 ### 1. Clonar y Configurar
 ```bash
@@ -39,7 +39,7 @@ La API estará disponible en: [http://localhost:8000](http://localhost:8000)
 - **Swagger UI**: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
 - **ReDoc**: [http://localhost:8000/api/redoc/](http://localhost:8000/api/redoc/)
 
-## 👥 Usuarios de prueba (Cargados con `load_sample_data`)
+## Usuarios de prueba (Cargados con `load_sample_data`)
 
 | Rol | Username | Password | Permisos |
 | :--- | :--- | :--- | :--- |
@@ -62,7 +62,7 @@ ecommerce/
 └── docker-compose.yml # Orquestación de contenedores (Web, DB, Redis)
 ```
 
-## 🛠️ Comandos útiles
+## Comandos útiles
 
 ```bash
 # Ver logs del servidor
