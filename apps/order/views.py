@@ -51,7 +51,8 @@ class OrderViewSet(viewsets.ModelViewSet):
         # Si es visitante, solo puede ver sus propias órdenes
         try:
             return queryset.filter(person__user=self.request.user)
-        except:
+        except Exception as e:
+            logger.error(f"Error al filtrar órdenes por usuario: {str(e)}")
             return Order.objects.none()
 
     def get_serializer_class(self):
