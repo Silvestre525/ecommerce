@@ -124,7 +124,17 @@ class OrderViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_400_BAD_REQUEST,
                 )
 
-        return super().create(request, *args, **kwargs)
+        response = super().create(request, *args, **kwargs)
+
+        if response.status_code == status.HTTP_201_CREATED:
+            orden_id = response.data.get("id")
+            email_usuario = request.user.email
+
+            from .tasks import send_mails_confirm
+
+            send_mails_confirm.delay(orden_id, email_usuario)
+
+        return response
 
     @extend_schema(
         tags=["Órdenes"],

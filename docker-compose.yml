@@ -40,6 +40,24 @@ services:
     volumes:
       - redis_data:/data
 
+  celery_worker:
+    build: .
+    command: celery -A core worker -l INFO
+    volumes:
+      - .:/app
+    environment:
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=db
+      - DB_PORT=5432
+      - SECRET_KEY=${SECRET_KEY}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    depends_on:
+      - django_redis
+      - db
+
 volumes:
   postgres_data:
   redis_data:

@@ -40,7 +40,7 @@ El carrito de compras vive en el **LocalStorage** del frontend. Al finalizar la 
 - **Validación previa**: Antes de enviar la orden, verifica que los productos tengan stock en el estado local.
 - **Sincronización**: Al cargar el carrito del LocalStorage, haz un `GET` de esos productos específicos para asegurar que los precios y stock sigan vigentes.
 
-## 🚀 Flujo de Trabajo Recomendado (Frontend)
+## Flujo de Trabajo Recomendado (Frontend)
 
 Para integrar esta API de manera eficiente, sigue estos flujos de usuario:
 
