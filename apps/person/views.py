@@ -8,10 +8,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .serializers import (
-    PersonSerializer,
     UserLoginSerializer,
     UserRegistrationSerializer,
 )
+from .services import AuthService, PersonService
 
 
 class LoginView(APIView):
@@ -41,32 +41,21 @@ class LoginView(APIView):
             username = serializer.validated_data["username"]
             password = serializer.validated_data["password"]
 
-            # Intentar autenticar
-            user = authenticate(username=username, password=password)
-
-            if user is not None:
-                if user.is_active:
-                    # Obtener o crear token
-                    token, created = Token.objects.get_or_create(user=user)
-                    return Response(
-                        {
-                            "token": token.key,
-                            "user_id": user.pk,
-                            "username": user.username,
-                            "message": "Login successful",
-                        },
-                        status=status.HTTP_200_OK,
-                    )
-                else:
-                    return Response(
-                        {"error": "User account is disabled."},
-                        status=status.HTTP_401_UNAUTHORIZED,
-                    )
-            else:
+            try:
+                user, token = AuthService.authenticate_user(username, password)
                 return Response(
-                    {"error": "Invalid username or password."},
-                    status=status.HTTP_401_UNAUTHORIZED,
+                    {
+                        "token": token.key,
+                        "user_id": user.pk,
+                        "username": user.username,
+                        "message": "Login successful",
+                    },
+                    status=status.HTTP_200_OK,
                 )
+            except ValueError as e:
+                return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+            except PermissionError as e:
+                return Response({"error": str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -94,8 +83,7 @@ class RegisterView(APIView):
     def post(self, request):
         serializer = UserRegistrationSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.save()
-            token = Token.objects.get(user=user)
+            user, token = AuthService.register_user(serializer)
             return Response(
                 {"token": token.key, "user_id": user.pk, "username": user.username},
                 status=status.HTTP_201_CREATED,
@@ -122,17 +110,5 @@ class ProfileView(APIView):
         },
     )
     def get(self, request):
-        try:
-            persona = request.user.person
-            persona_data = PersonSerializer(persona).data
-        except:
-            persona_data = None
-
-        return Response(
-            {
-                "username": request.user.username,
-                "email": request.user.email,
-                "persona": persona_data,
-                "groups": list(request.user.groups.values_list("name", flat=True)),
-            }
-        )
+        data = PersonService.get_profile_data(request.user)
+        return Response(data)
