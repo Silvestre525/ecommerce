@@ -11,6 +11,7 @@ from rest_framework.response import Response
 from ..utils.permissions import IsAdministrador, IsAdministradorOrVisitante
 from .models import Category
 from .serializers import CategorySerializer
+from .services import CategoryService
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +40,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
         """
         Filtra solo categorías activas
         """
-        return Category.objects.filter(is_active=True)
+        return Category.objects.active()
 
     def get_permissions(self):
         """
@@ -154,7 +155,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     )
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def public_list(self, request):
-        categories = self.get_queryset().values("id", "name", "description")
+        categories = CategoryService.get_public_list()
 
         return Response(
             {

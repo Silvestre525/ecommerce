@@ -18,6 +18,7 @@ from .serializers import (
     ProvinceDetailSerializer,
     ProvinceSerializer,
 )
+from .services import GeoService
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +75,7 @@ class CountryViewSet(viewsets.ModelViewSet):
     )
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
     def public_list(self, request):
-        countries = Country.objects.values("id", "name").order_by("name")
+        countries = GeoService.get_public_countries()
 
         return Response(
             {
@@ -144,20 +145,8 @@ class ProvinceViewSet(viewsets.ModelViewSet):
     def by_country(self, request):
         country_id = request.query_params.get("country_id")
 
-        if not country_id:
-            return Response(
-                {"error": "Parámetro 'country_id' es requerido"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         try:
-            country = Country.objects.get(id=country_id)
-            provinces = (
-                Province.objects.filter(country=country)
-                .values("id", "name")
-                .order_by("name")
-            )
-
+            country, provinces = GeoService.get_provinces_by_country(country_id)
             return Response(
                 {
                     "country": {"id": country.id, "name": country.name},
@@ -165,9 +154,14 @@ class ProvinceViewSet(viewsets.ModelViewSet):
                     "count": len(provinces),
                 }
             )
-        except Country.DoesNotExist:
+        except ValueError as e:
             return Response(
-                {"error": "País no encontrado"}, status=status.HTTP_404_NOT_FOUND
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except KeyError as e:
+            return Response(
+                {"error": str(e).strip("'")}, status=status.HTTP_404_NOT_FOUND
             )
 
 
@@ -233,20 +227,8 @@ class CityViewSet(viewsets.ModelViewSet):
     def by_province(self, request):
         province_id = request.query_params.get("province_id")
 
-        if not province_id:
-            return Response(
-                {"error": "Parámetro 'province_id' es requerido"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         try:
-            province = Province.objects.select_related("country").get(id=province_id)
-            cities = (
-                City.objects.filter(province=province)
-                .values("id", "name")
-                .order_by("name")
-            )
-
+            province, cities = GeoService.get_cities_by_province(province_id)
             return Response(
                 {
                     "province": {
@@ -258,9 +240,14 @@ class CityViewSet(viewsets.ModelViewSet):
                     "count": len(cities),
                 }
             )
-        except Province.DoesNotExist:
+        except ValueError as e:
             return Response(
-                {"error": "Provincia no encontrada"}, status=status.HTTP_404_NOT_FOUND
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except KeyError as e:
+            return Response(
+                {"error": str(e).strip("'")}, status=status.HTTP_404_NOT_FOUND
             )
 
     @action(detail=False, methods=["get"], permission_classes=[AllowAny])
@@ -279,14 +266,7 @@ class CityViewSet(viewsets.ModelViewSet):
         logger.debug(f"Consulta de ciudades por país {country_id}")
 
         try:
-            country = Country.objects.get(id=country_id)
-            cities = (
-                City.objects.select_related("province")
-                .filter(province__country=country)
-                .values("id", "name", "province__name")
-                .order_by("name")
-            )
-
+            country, cities = GeoService.get_cities_by_country(country_id)
             return Response(
                 {
                     "country": {"id": country.id, "name": country.name},
@@ -294,7 +274,12 @@ class CityViewSet(viewsets.ModelViewSet):
                     "count": len(cities),
                 }
             )
-        except Country.DoesNotExist:
+        except ValueError as e:
             return Response(
-                {"error": "País no encontrado"}, status=status.HTTP_404_NOT_FOUND
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        except KeyError as e:
+            return Response(
+                {"error": str(e).strip("'")}, status=status.HTTP_404_NOT_FOUND
             )

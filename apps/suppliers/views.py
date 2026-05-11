@@ -38,7 +38,7 @@ class SuppliersViewSet(viewsets.ModelViewSet):
         """
         Filtra solo proveedores activos
         """
-        return Suppliers.objects.select_related("city").filter(is_active=True)
+        return Suppliers.objects.with_details().active()
 
     def get_permissions(self):
         """

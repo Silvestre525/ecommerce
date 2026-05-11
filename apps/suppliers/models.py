@@ -1,7 +1,8 @@
 from django.db import models
-from ..BaseModel.models import BaseModel
-from ..geo.models import Country, Province, City
-class Suppliers(BaseModel):
+from ..geo.models import City
+from .managers import SuppliersManager
+
+class Suppliers(models.Model):
     id = models.AutoField(primary_key=True)
     company_name = models.CharField(max_length=50, null=False, blank=False)
     contact_person= models.CharField(max_length=50, null=False, blank=False)
@@ -14,6 +15,7 @@ class Suppliers(BaseModel):
     class Meta:
         db_table = "Suppliers"
 
+    objects = SuppliersManager()
+
     def __str__(self):
         return self.company_name
-    
