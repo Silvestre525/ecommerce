@@ -4,11 +4,12 @@ API REST robusta para un sistema de ecommerce de indumentaria, desarrollada con 
 
 ## Características principales
 
+- **Arquitectura de Software Avanzada**: Implementación estricta del patrón **Service Layer** y **Custom Managers**. Las vistas actúan como controladores delgados ("Thin Views"), separando completamente la lógica de negocio y de base de datos, lo que garantiza alta cohesión y bajo acoplamiento.
 - **Seguridad en Precios**: El backend calcula automáticamente los totales de las órdenes basándose en precios de base de datos (evita manipulación del cliente).
+- **Gestión de Stock Atómica**: Control de inventario en tiempo real con validación previa a la venta, delegando la complejidad al `ProductService`.
 - **Historial de Precios**: Registro del precio de compra en cada ítem de la orden (`DetailOrder`).
-- **Gestión de Stock Atómica**: Control de inventario en tiempo real con validación previa a la venta.
-- **Autenticación Robusta**: Tokens con roles diferenciados (Administrador/Visitante).
-- **Sistema Geográfico**: Soporte para direcciones con Countries, Provinces y Cities.
+- **Autenticación Modular**: Tokens con roles diferenciados (Administrador/Visitante) manejados de forma centralizada por el `AuthService`.
+- **Sistema Geográfico Escalable**: Soporte para direcciones con relaciones en cascada (Countries, Provinces y Cities) provistas por el `GeoService`.
 - **Documentación Completa**: OpenAPI/Swagger y [Guía de Lógica de Negocio](./docs/api_guide.md).
 
 ## Instalación (Recomendada con Docker)
@@ -33,7 +34,7 @@ docker compose exec web python manage.py load_sample_data --clear
 
 La API estará disponible en: [http://localhost:8000](http://localhost:8000)
 
-## 📖 Documentación
+##  Documentación
 
 - **Guía de Desarrollo y Frontend**: [docs/api_guide.md](./docs/api_guide.md) (Lógica de negocio y flujos).
 - **Swagger UI**: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
@@ -46,7 +47,7 @@ La API estará disponible en: [http://localhost:8000](http://localhost:8000)
 | **Administrador** | `admin` | `admin123` | Control total del catálogo y órdenes |
 | **Visitante** | `visitor` | `visitor123` | Compra de productos y ver órdenes propias |
 
-## 📐 Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```text
 ecommerce/
