@@ -2,7 +2,6 @@ services:
   db:
     image: postgres:15
     environment:
-      # Estas variables son leídas por la imagen de postgres para la inicialización
       - POSTGRES_DB=${DB_NAME}
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
@@ -19,7 +18,6 @@ services:
     ports:
       - "8000:8000"
     environment:
-      # Estas variables son leídas por Django
       - DB_NAME=${DB_NAME}
       - DB_USER=${DB_USER}
       - DB_PASSWORD=${DB_PASSWORD}
