@@ -1,5 +1,6 @@
 from django.db import models
 from ..person.models import Person
+from .managers import OrderManager
 
 class Order(models.Model):
     STATUS_CHOICES = [
@@ -19,6 +20,8 @@ class Order(models.Model):
     )
     creation_date = models.DateTimeField(auto_now_add=True)
     person = models.ForeignKey(Person, on_delete=models.CASCADE, related_name='orders')
+
+    objects = OrderManager()
 
     class Meta:
         db_table = "Orders"

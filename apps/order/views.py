@@ -14,6 +14,7 @@ from ..utils.permissions import (
 )
 from .models import Order
 from .serializers import OrderCreateSerializer, OrderDetailSerializer, OrderSerializer
+from .services import OrderService
 
 logger = logging.getLogger(__name__)
 
@@ -42,18 +43,7 @@ class OrderViewSet(viewsets.ModelViewSet):
         """
         Filtra órdenes según el usuario
         """
-        queryset = Order.objects.select_related("person", "person__user")
-
-        # Si es administrador, puede ver todas las órdenes
-        if self.request.user.groups.filter(name="Administrador").exists():
-            return queryset
-
-        # Si es visitante, solo puede ver sus propias órdenes
-        try:
-            return queryset.filter(person__user=self.request.user)
-        except Exception as e:
-            logger.error(f"Error al filtrar órdenes por usuario: {str(e)}")
-            return Order.objects.none()
+        return Order.objects.with_details().for_user(self.request.user)
 
     def get_serializer_class(self):
         """
@@ -114,26 +104,20 @@ class OrderViewSet(viewsets.ModelViewSet):
         },
     )
     def create(self, request, *args, **kwargs):
-        # Si es visitante, asignar automáticamente su persona
-        if not request.user.groups.filter(name="Administrador").exists():
-            try:
-                person = request.user.person
-                request.data["person"] = person.id
-            except:
-                return Response(
-                    {"error": "No se encontró el perfil de persona para el usuario"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+        try:
+            OrderService.prepare_create_data(request.data, request.user)
+        except ValueError as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
         response = super().create(request, *args, **kwargs)
 
         if response.status_code == status.HTTP_201_CREATED:
             orden_id = response.data.get("id")
             email_usuario = request.user.email
-
-            from .tasks import send_mails_confirm
-
-            send_mails_confirm.delay(orden_id, email_usuario)
+            OrderService.process_after_creation(orden_id, email_usuario)
 
         return response
 
@@ -196,19 +180,18 @@ class OrderViewSet(viewsets.ModelViewSet):
     )
     def my_orders(self, request):
         try:
-            person = request.user.person
-            orders = Order.objects.filter(person=person).order_by("-creation_date")
+            orders, message = OrderService.get_user_orders(request.user)
             serializer = OrderSerializer(orders, many=True)
 
             return Response(
                 {
-                    "message": f"Órdenes de {person.name} {person.last_name}",
+                    "message": message,
                     "count": orders.count(),
                     "orders": serializer.data,
                 }
             )
-        except:
+        except ValueError as e:
             return Response(
-                {"error": "No se encontró el perfil de persona para el usuario"},
+                {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST,
             )
