@@ -17,6 +17,7 @@ from .serializers import (
     ProductPublicSerializer,
     ProductSerializer,
 )
+from .services import ProductService
 
 logger = logging.getLogger(__name__)
 
@@ -45,20 +46,14 @@ class ProductViewSet(viewsets.ModelViewSet):
         """
         Optimiza las consultas con select_related y prefetch_related
         """
-        base_queryset = (
-            Product.objects.select_related("color", "size")
-            .prefetch_related("categories", "suppliers")
-            .filter(is_active=True)
-        )
+        base_queryset = Product.objects.with_details().active()
 
         # Para admin, mostrar todos los productos (incluso inactivos)
         if (
             self.request.user.is_authenticated
             and self.request.user.groups.filter(name="Administrador").exists()
         ):
-            return Product.objects.select_related("color", "size").prefetch_related(
-                "categories", "suppliers"
-            )
+            return Product.objects.with_details()
 
         return base_queryset
 
@@ -144,19 +139,10 @@ class ProductViewSet(viewsets.ModelViewSet):
 
         # Agregar estadísticas útiles
         queryset = self.filter_queryset(self.get_queryset())
-        total_stock = sum(product.stock for product in queryset)
-        low_stock_count = len([p for p in queryset if p.is_low_stock])
 
         if isinstance(response.data, dict) and "results" in response.data:
-            response.data.update(
-                {
-                    "statistics": {
-                        "total_products": queryset.count(),
-                        "total_stock": total_stock,
-                        "low_stock_products": low_stock_count,
-                    }
-                }
-            )
+            stats = ProductService.get_stock_statistics(queryset)
+            response.data.update({"statistics": stats})
 
         return response
 
@@ -344,15 +330,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=["patch"])
     def toggle_status(self, request, pk=None):
         product = self.get_object()
-
-        if product.is_active:
-            product.deactivate()
-            message = f"Producto '{product.name}' desactivado"
-        else:
-            product.activate()
-            message = f"Producto '{product.name}' activado"
-
-        logger.info(f"{message} por {request.user.username}")
+        message = ProductService.toggle_status(product, user=request.user)
 
         serializer = ProductDetailSerializer(product)
         return Response(
@@ -387,43 +365,23 @@ class ProductViewSet(viewsets.ModelViewSet):
         action = request.data.get("action")
         quantity = request.data.get("quantity")
 
-        if not action or not quantity:
+        if not action or quantity is None:
             return Response(
                 {"error": "Se requieren 'action' y 'quantity'"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        if quantity <= 0:
-            return Response(
-                {"error": "La cantidad debe ser mayor a 0"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
         try:
-            if action == "add":
-                new_stock = product.add_stock(quantity)
-                message = f"Se añadieron {quantity} unidades"
-            elif action == "reduce":
-                new_stock = product.reduce_stock(quantity)
-                message = f"Se redujeron {quantity} unidades"
-            else:
-                return Response(
-                    {"error": "Acción debe ser 'add' o 'reduce'"},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
-
-            logger.info(
-                f"Stock actualizado para {product.name}: {message} por {request.user.username}"
+            message, prev_stock, cur_stock = ProductService.update_stock(
+                product, action, quantity, user=request.user
             )
 
             serializer = ProductDetailSerializer(product)
             return Response(
                 {
                     "message": message,
-                    "previous_stock": new_stock - quantity
-                    if action == "add"
-                    else new_stock + quantity,
-                    "current_stock": new_stock,
+                    "previous_stock": prev_stock,
+                    "current_stock": cur_stock,
                     "product": serializer.data,
                 }
             )
