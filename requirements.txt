@@ -32,3 +32,4 @@ django-filter==24.2
 whitenoise==6.11.0
 celery==5.4.0
 redis==5.0.1
+afip.py==1.2.0
