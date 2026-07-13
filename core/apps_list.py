@@ -21,4 +21,5 @@ APPS = [
     "rest_framework.authtoken",
     "django_filters",
     "apps.order",
+    "apps.billing",
 ]
